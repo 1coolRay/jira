@@ -2,7 +2,7 @@ import React from "react";
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
 import { useState, useEffect } from "react";
-import { cleanObject } from "../../utils/index";
+import { cleanObject, useMount, useDebounce } from "../../utils/index";
 import * as qs from "qs";
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -25,9 +25,9 @@ export const ProjectListScreen = () => {
     return () => {
       //   cleanup
     };
-  }, [param]);
+  }, [useDebounce(param, 1000)]);
   //获取用户列表
-  useEffect(() => {
+  useMount(() => {
     fetch(`${apiUrl}/users`).then(async (response) => {
       if (response.ok) {
         setUsers(await response.json());
@@ -36,7 +36,7 @@ export const ProjectListScreen = () => {
     return () => {
       //   cleanup
     };
-  }, []);
+  });
   return (
     <div>
       <SearchPanel
