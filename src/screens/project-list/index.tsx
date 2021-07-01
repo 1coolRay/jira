@@ -1,50 +1,42 @@
-import React from "react";
 import { SearchPanel } from "./search-panel";
 import { List } from "./list";
-import { useState, useEffect } from "react";
-import { cleanObject, useMount, useDebounce } from "../../utils/index";
-import * as qs from "qs";
-const apiUrl = process.env.REACT_APP_API_URL;
+import { useState } from "react";
+import { useDebounce } from "../../utils/index";
+import styled from "@emotion/styled";
+import { Typography } from "antd";
+import { useProject } from "utils/project";
+import { useUsers } from "utils/user";
 
 export const ProjectListScreen = () => {
-  const [users, setUsers] = useState([]);
   const [param, setParam] = useState({
     name: "",
     personId: "",
   });
-  const [list, setList] = useState([]);
+  const debounceParam = useDebounce(param, 1000);
   //获取项目列表
-  useEffect(() => {
-    fetch(`${apiUrl}/projects?${qs.stringify(cleanObject(param))}`).then(
-      async (response) => {
-        if (response.ok) {
-          setList(await response.json());
-        }
-      }
-    );
-    return () => {
-      //   cleanup
-    };
-  }, [useDebounce(param, 1000)]);
+  const { isLoading, error, data: list } = useProject(debounceParam);
   //获取用户列表
-  useMount(() => {
-    fetch(`${apiUrl}/users`).then(async (response) => {
-      if (response.ok) {
-        setUsers(await response.json());
-      }
-    });
-    return () => {
-      //   cleanup
-    };
-  });
+  const { data: users } = useUsers();
+ 
   return (
-    <div>
+    <Container>
+      <h1>项目列表</h1>
       <SearchPanel
-        users={users}
+        users={users || []}
         param={param}
         setParam={setParam}
       ></SearchPanel>
-      <List users={users} list={list}></List>
-    </div>
+      {error ? (
+        <Typography.Text type={"danger"}>{error.message}</Typography.Text>
+      ) : null}
+      <List
+        loading={isLoading}
+        users={users || []}
+        dataSource={list || []}
+      ></List>
+    </Container>
   );
 };
+const Container = styled.div`
+  padding: 3.2rem;
+`;

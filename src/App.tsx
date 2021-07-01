@@ -1,11 +1,18 @@
 import React from "react";
-import { ProjectListScreen } from "./screens/project-list/index";
 import "./App.css";
-
+import { AuthenticatedApp } from "./authenticated-app";
+import { UnauthenticatedApp } from "unauthenticated-app";
+import { useAuth } from "context/auth-context";
+import { ErrorBoundary } from "components/error-boundaries";
+import { FullPageErrorFallback } from "components/lib";
 function App() {
+  const { user } = useAuth();
+  console.log("useruseruser", user);
   return (
     <div className="App">
-      <ProjectListScreen />
+      <ErrorBoundary fallbackRender={FullPageErrorFallback}>
+        {user ? <AuthenticatedApp /> : <UnauthenticatedApp />}
+      </ErrorBoundary>
     </div>
   );
 }
