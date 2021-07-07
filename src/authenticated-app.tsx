@@ -6,42 +6,54 @@ import { Row } from "./components/lib";
 import { Menu, Dropdown, Button } from "antd";
 import { ReactComponent as SoftwareLogo } from "./assets/software-logo.svg";
 import { useDocumentTitle } from "utils";
+import { Navigate, Route, Routes } from 'react-router'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { ProjectScreen } from 'screens/project'
 export const AuthenticatedApp = () => {
-  const { logout, user } = useAuth();
   //切换浏览器title
   useDocumentTitle("项目列表", false);
   return (
     <Container>
-      <Header between={true}>
-        <HeaderLeft gap={true}>
-          <SoftwareLogo width={"18rem"} color={"rgb(38,132,255)"} />
-          <h3>项目</h3>
-          <h3>用户</h3>
-        </HeaderLeft>
-        <HeaderRight>
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item key={"logout"}>
-                  <Button onClick={logout} type="link">
-                    退出登录
-                  </Button>
-                </Menu.Item>
-              </Menu>
-            }
-          >
-            <Button onClick={(e) => e.preventDefault()} type="link">
-              Hi,{user?.name}
-            </Button>
-          </Dropdown>
-        </HeaderRight>
-      </Header>
+      <PageHeader />
       <Main>
-        <ProjectListScreen />
+        <Router>
+          <Routes>
+            <Route path={'/projects'} element={<ProjectListScreen />} />
+            <Route path={'/projects/:projectId/*'} element={<ProjectScreen />} />
+          </Routes>
+        </Router>
       </Main>
     </Container>
   );
 };
+const PageHeader = () => {
+  const { logout, user } = useAuth();
+  return <Header between={true}>
+    <HeaderLeft gap={true}>
+      <SoftwareLogo width={"18rem"} color={"rgb(38,132,255)"} />
+      <h3>项目</h3>
+      <h3>用户</h3>
+    </HeaderLeft>
+    <HeaderRight>
+      <Dropdown
+        overlay={
+          <Menu>
+            <Menu.Item key={"logout"}>
+              <Button onClick={logout} type="link">
+                退出登录
+            </Button>
+            </Menu.Item>
+          </Menu>
+        }
+      >
+        <Button onClick={(e) => e.preventDefault()} type="link">
+          Hi,{user?.name}
+        </Button>
+      </Dropdown>
+    </HeaderRight>
+  </Header>
+
+}
 const Container = styled.div`
   display: grid;
   height: 100vh;
